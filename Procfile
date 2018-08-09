@@ -1,1 +1,1 @@
-web: python hangman.py 
+bot: python hangman.py 
