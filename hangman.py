@@ -165,20 +165,17 @@ def main():
         last_update_id = last_update['update_id']
         last_chat_text = last_update['message']['text']
         last_chat_id = last_update['message']['chat']['id']
-        if last_chat_text == '/hangman':
+        if last_chat_text == '/start':
+            hangbot.send_message(last_chat_id, 'Welcome to the game Hangman!\nfor starting game you need send /hangman\nYou have 6 guesses left and 3 warning left.\nFor the wrong vowel - a e i o subtracted 2 guesses, else - 1 guesses\nGood luck!')
+        elif last_chat_text == '/hangman':
             secret_word = choose_word(wordlist=load_words())
             list_tempt = []
             true_list = []
             guess = 6
             warning = 3
-            hangbot.send_message(last_chat_id, 'Welcome to the game Hangman!')
-            hangbot.send_message(last_chat_id, 'I am thinking of a word that is {} letters long.'.format(len(secret_word)))
-            hangbot.send_message(last_chat_id, 'You have {} warnings left.'.format(warning))
-            hangbot.send_message(last_chat_id, '-------------------------')
+            hangbot.send_message(last_chat_id, 'I am thinking of a word that is {} letters long.\nYou have {} warnings left.'.format(len(secret_word), warning))
             while guess > 0:
-                hangbot.send_message(last_chat_id, 'You have {} guesses left.'.format(guess))
-                hangbot.send_message(last_chat_id, 'Available letters: {}'.format(get_available_letters(list_tempt)))
-                hangbot.send_message(last_chat_id, 'Please guess a letter:')
+                hangbot.send_message(last_chat_id, 'You have {} guesses left.\nAvailable letters: {}\nPlease guess a letter:'.format(guess, get_available_letters(list_tempt)))
                 new_offset = last_update_id + 1
                 hangbot.get_updates(new_offset)
                 last_update = hangbot.get_last_update()
@@ -197,32 +194,25 @@ def main():
                         else:
                             guess -= 2
                         true_list.pop()
-                        hangbot.send_message(last_chat_id, 'Oops! That letter is not in my word: {}'.format(get_guessed_word(secret_word, true_list)))
+                        hangbot.send_message(last_chat_id, 'Oops! That letter is not in my word: \n{}'.format(get_guessed_word(secret_word, true_list)))
                     if get_guessed_word(secret_word, true_list) == secret_word:
-                        hangbot.send_message(last_chat_id, 'Congratulations, you won!')
-                        hangbot.send_message(last_chat_id, 'Your total score for this game is: {}'.format(guess*len(true_list)))
+                        hangbot.send_message(last_chat_id, 'Congratulations, you won!\nYour total score for this game is: {}'.format(guess*len(true_list)))
                         break
-                    hangbot.send_message(last_chat_id, '------------------------------------------------------------------')
                 elif last_chat_text.lower() == '*':
-                    hangbot.send_message(last_chat_id, 'Possible word matches are:')
-                    hangbot.send_message(last_chat_id, show_possible_matches(get_guessed_word(secret_word, true_list), get_available_letters(list_tempt)))
+                    hangbot.send_message(last_chat_id, 'Possible word matches are:\n{}'.format(show_possible_matches(get_guessed_word(secret_word, true_list), get_available_letters(list_tempt))))
                 else:
                     if warning > 0:
                         warning -= 1
                         if last_chat_text.lower() in list_tempt:
-                            hangbot.send_message(last_chat_id, "Oops! You've already guessed that letter. You have {} warning left: {}".format(warning, get_guessed_word(secret_word, true_list)))
+                            hangbot.send_message(last_chat_id, "Oops! You've already guessed that letter. You have {} warning left:\n{}".format(warning, get_guessed_word(secret_word, true_list)))
                         else:
                             hangbot.send_message(last_chat_id, 'Oops! That is not a valid letter. You have {} warning left: {}'.format(warning, get_guessed_word(secret_word, true_list)))
-                        hangbot.send_message(last_chat_id,
-                                             '------------------------------------------------------------------')
                     else:
                         guess -= 1
                         if last_chat_text.lower() in list_tempt:
-                            hangbot.send_message(last_chat_id, "Oops! You've already guessed that letter. You have no warnings left so you lose one guess: {}".format(get_guessed_word(secret_word, true_list)))
+                            hangbot.send_message(last_chat_id, "Oops! You've already guessed that letter. You have no warnings left so you lose one guess:\n{}".format(get_guessed_word(secret_word, true_list)))
                         else:
-                            hangbot.send_message(last_chat_id, 'Oops! That is not a valid letter. You have no warnings left so you lose one guess: {}'.format(get_guessed_word(secret_word, true_list)))
-                        hangbot.send_message(last_chat_id,
-                                             '------------------------------------------------------------------')
+                            hangbot.send_message(last_chat_id, 'Oops! That is not a valid letter. You have no warnings left so you lose one guess:\n{}'.format(get_guessed_word(secret_word, true_list)))
                 if guess <= 0:
                     hangbot.send_message(last_chat_id, 'Sorry, you ran out of guesses. The word was {}.'.format(secret_word))
 
